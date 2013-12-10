@@ -6,6 +6,7 @@ import requests
 from requests_oauthlib import OAuth1
 from urlparse import parse_qs
 from settings import TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, TWITTER_OAUTH_TOKEN, TWITTER_OAUTH_TOKEN_SECRET
+from operator import itemgetter
 
 
 REQUEST_TOKEN_URL = "https://api.twitter.com/oauth/request_token"
