@@ -39,17 +39,12 @@ def load_urls():
             continue
         key, url = line.split()
         urls[key] = url
-        #print key + "////"  + url # khh-debug
 
 def get_page(url, htmldir):
     page_in_txt = urllib2.urlopen(url).read()
 
     idx = url.find('num=')
-    #print url # khh-debug
-    #print idx # khh-debug
-    #idx = url.find('memCode=')
     if idx != -1:
-        #filename = '%s/%s.html' % (htmldir, url[idx + len('memCode='):]) # khh-old
         filename = '%s/%s.html' % (htmldir, url[idx + len('num='):])
     else:
         filename = '%s/index.html' % htmldir # khh-comment : is it necessary?
@@ -143,11 +138,6 @@ def debug_xpath_data(hxs):
 
 def extract_profile(page):
     def parse_name_and_birth(name_and_birth):
-        # name_and_birth example:
-        #        <strong>김윤덕</strong> (金潤德)<br>
-        #        <strong class="txt_s">KIM Yunduk</strong><br>
-        #        <span class="txt_e txt_s">1966.05.23</span>
-
         #<h4>강기윤</h4>
         #    <ul>
         #      <li class="photo">
@@ -158,9 +148,7 @@ def extract_profile(page):
         #      <li>1960-06-04</li>
         #   </ul>
 
-        #tokens = find_bracketed_texts_regexp(r'<strong>(.+?)</strong>\s\((.+?)\)<br\s*/?>.*?<strong class="txt_s">(.*?)</strong><br\s*/?>.*?<span class="txt_e txt_s">(.*)</span>', name_and_birth) # khh-old
         tokens = find_bracketed_texts_regexp(r'<h4>(.+?)</h4>.*?<ul>.*?<li" "class=.*?<li>(.*?)</li>.*?<li>(.*?)</li>.*?<li>(.*?)</li></ul>', name_and_birth)
-        #print tokens # khh-debug
         #name_kr, name_cn, name_en, birth = tokens # khh-tmp-block
         #return [name_kr, name_cn, name_en, birth.replace('.','-')] # khh-tmp-block
 
@@ -200,18 +188,8 @@ def extract_profile(page):
     except AttributeError as e:
         others[5] = ''
 
-    print others
-    stripped = [re.sub('\s+', '', i) for i in others]
-    #for x in others:
-    #    if '\t' in x:
-    #        print "before:"+x
-    #        #raw_input()
-    #        #x.replace(" ","")
-    #        str.strip(x.encode('utf-8'))
-    #        print "after:"+x
-    print others
-    raw_input()
-    full_profile = list(name_and_birth + others)
+    stripped = [re.sub('[\s\r]+', '', i) for i in others]
+    full_profile = list(name_and_birth + stripped)
     full_profile.append(experience)
     full_profile.append(photo)
     [p.replace('\n','') for p in full_profile]
@@ -219,7 +197,6 @@ def extract_profile(page):
 
 def crawl_ppl_data(htmldir):
     print len(ppl_urls)
-    #for i, url in enumerate(ppl_urls): # khh-origin
     for i, url in enumerate(ppl_urls[:10]):
         #print url # khh-debug
         page = get_page(url, htmldir)
@@ -239,7 +216,6 @@ def write_csv():
     print 'Data succesfully written'
 
 def main(argv, datadir=DATADIR):
-    url = "http://www.assembly.go.kr/assm/memPop/memPopup.do?num=2680"
     htmldir = "./html"
     load_urls()
     get_ppl_urls(htmldir)
